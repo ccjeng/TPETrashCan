@@ -1,18 +1,9 @@
-table {
-    table-layout: fixed;
-    word-wrap: break-word;
-}
-
 #map {
-    height:100vh;
-    display: block; 
-    /*width: 980px; height: 600px;*/
+	height:100vh;
+    margin-top: 0;
 }
 
-
-.infoWindowContent {
-    font-size:  14px !important;
-    border-top: 1px solid #ccc;
-    padding-top: 10px;
+.navbar-default {
+    margin-bottom: 0;
 }
 
