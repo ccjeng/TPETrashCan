@@ -3,9 +3,7 @@
 //Parse.$ = jQuery;
 Parse.initialize('5fzYdG6YMpMPKBNSqvzhEL1OVoXgcVvlCAghW09Q', 'NK9ycOzWNik9d6axOAndjYXwRuycfX2qTIyidyxV');
 
-//Get user location HTML5 >> if no location, set default location
-
-
+//Get user location
 var defaultLocationLatitude = 25.0339031;
 var defaultLocationLongitude = 121.5645098;
 
@@ -14,17 +12,13 @@ var currentLocationLongitude = defaultLocationLongitude;
  
 function getLocation() {
   if (navigator.geolocation) {
-          var geo=navigator.geolocation;
-          var option={
-                enableAcuracy:false,
-                maximumAge:0,
-                timeout:600000
-                };
-          geo.getCurrentPosition(successCallback,
-                                 errorCallback,
-                                 option
-                                 );
-          }
+        var option={
+            enableAcuracy:false,
+            maximumAge:0,
+            timeout:600000
+        };
+        navigator.geolocation.getCurrentPosition(successCallback, errorCallback, option);
+  }
   else {
         alert('此瀏覽器不支援地理定位功能!');
   }
@@ -33,8 +27,7 @@ function getLocation() {
         currentLocationLatitude = position.coords.latitude;
         currentLocationLongitude = position.coords.longitude;    
 
-        console.log('successCallback = ' + currentLocationLatitude + ',' + currentLocationLongitude);
-
+        //console.log('successCallback = ' + currentLocationLatitude + ',' + currentLocationLongitude);
         map.panTo( new google.maps.LatLng(currentLocationLatitude, currentLocationLongitude) );
 
   }
@@ -45,7 +38,7 @@ function getLocation() {
               2:"無法取得位置資訊",
               3:"位置查詢逾時"
               };
-        console.log(errorTypes[error.code]);
+        alert(errorTypes[error.code]);
         console.log("code=" + error.code + " " + error.message); //開發測試時用
   }
 }
@@ -55,10 +48,8 @@ var map;
 function initMap() {
   getLocation();
 
-  console.log(currentLocationLatitude + ',' + currentLocationLongitude);
-
   var mapOptions = {
-     center: {lat: currentLocationLatitude, lng: currentLocationLongitude},
+      center: {lat: currentLocationLatitude, lng: currentLocationLongitude},
       zoom: 17,
       mapTypeId: google.maps.MapTypeId.ROADMAP
   };
