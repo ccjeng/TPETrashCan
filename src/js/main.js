@@ -9,7 +9,7 @@ var defaultLocationLongitude = 121.5645098;
 
 var currentLocationLatitude = defaultLocationLatitude;
 var currentLocationLongitude = defaultLocationLongitude;
- 
+
 function getLocation() {
   if (navigator.geolocation) {
         var option={
@@ -27,8 +27,8 @@ function getLocation() {
         currentLocationLatitude = position.coords.latitude;
         currentLocationLongitude = position.coords.longitude;    
 
-        //console.log('successCallback = ' + currentLocationLatitude + ',' + currentLocationLongitude);
-        map.panTo( new google.maps.LatLng(currentLocationLatitude, currentLocationLongitude) );
+        currentMarker();
+
 
   }
   function errorCallback(error) {
@@ -46,7 +46,6 @@ function getLocation() {
 
 var map;
 function initMap() {
-  getLocation();
 
   var mapOptions = {
       center: {lat: currentLocationLatitude, lng: currentLocationLongitude},
@@ -56,8 +55,28 @@ function initMap() {
 
   map = new google.maps.Map(document.getElementById("map"), mapOptions);
 
+  getLocation();
+
 }
 
+function currentMarker(){
+
+  var GeoMarker = new GeolocationMarker(map);
+
+  GeoMarker.setCircleOptions({fillColor: '#808080'});
+
+  google.maps.event.addListenerOnce(GeoMarker, 'position_changed', function() {
+     map.setCenter(this.getPosition());
+     //map.fitBounds(this.getBounds());
+  });
+
+  google.maps.event.addListener(GeoMarker, 'geolocation_error', function(e) {
+     alert('無法取得位置資訊. ' + e.message);
+  });
+
+  GeoMarker.setMap(map);
+
+}
 
 var mc;
 var result = [];
@@ -75,7 +94,7 @@ var processCallback = function(res) {
                         addMarker(result[i]);
                 }
 
-                mc = new MarkerClusterer(map, markers, {gridSize: 80, maxZoom: 14});
+           mc = new MarkerClusterer(map, markers, {gridSize: 80, maxZoom: 14});
 
 }
 
@@ -95,17 +114,14 @@ var process = function(skip) {
 }
 process(false);
 
-//
-
-/*
-google.maps.InfoWindow.prototype.isOpen = function(){
-  var map = this.getMap();
-  return (map !== null && typeof map !== "undefined");
-}*/
-
 
 var markers = [];
 var image = 'img/pin.png';
+
+google.maps.InfoWindow.prototype.isOpen = function(){
+  var map = this.getMap();
+  return (map !== null && typeof map !== "undefined");
+}
 
 var addMarker = function(data){
 
@@ -126,11 +142,13 @@ var addMarker = function(data){
 
   markers.push(marker);
 
+
   google.maps.event.addListener(marker, 'click', function(e){
       map.panTo( this.position );
       //map.setZoom(17);
-      //for (var i = 0; i < markers.length; i++) { if(markers[i].infowindow.isOpen()){ markers[i].infowindow.close(); } }
+      for (var i = 0; i < markers.length; i++) { if(markers[i].infowindow.isOpen()){ markers[i].infowindow.close(); } }
       this.infowindow.open(map, marker);
+
   });
 };
 
