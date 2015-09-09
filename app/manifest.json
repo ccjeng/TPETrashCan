@@ -1,0 +1,20 @@
+{
+  "manifest_version": 2,
+
+  "name": "台北丟垃圾",
+  "description": "台北市行人垃圾桶定位查詢",
+  "version": "1.0",
+
+  "icons": { "128": "icon.png" }, 
+  "app": { 
+    "urls": [ 
+    "http://bin.ccjeng.com/" 
+    ], 
+    "launch": {"web_url": "http://bin.ccjeng.com/" } 
+  }, 
+
+  "permissions": [
+    "activeTab",
+    "http://bin.ccjeng.com/"
+  ]
+}
