@@ -1,7 +1,6 @@
 
 //initialize
-//Parse.$ = jQuery;
-Parse.initialize('5fzYdG6YMpMPKBNSqvzhEL1OVoXgcVvlCAghW09Q', 'NK9ycOzWNik9d6axOAndjYXwRuycfX2qTIyidyxV');
+var myFirebaseRef = new Firebase("https://tptrashcan.firebaseio.com/results");
 
 //Get user location
 var defaultLocationLatitude = 25.0339031;
@@ -80,40 +79,22 @@ function currentMarker(){
 
 var mc;
 var result = [];
-var processCallback = function(res) {
-                result = result.concat(res);
-                if (res.length == 1000) {
-                  process(res[res.length-1].id);
-                  return;
-                }   
-                //console.log(result.length);
 
-                //To print all results
-                for(var i=0;i<result.length;i++){
-                        //console.log(result[i].id);
-                        addMarker(result[i]);
-                }
+function getTrashCanData() {
 
-           mc = new MarkerClusterer(map, markers, {gridSize: 80, maxZoom: 14});
+	myFirebaseRef.on("value", function(snapshot) {
 
+	  	result = snapshot.val();
+
+		for(var i=0; i<result.length;i++) {
+			addMarker(result[i]);
+		} 
+	}, function (errorObject) {
+	  console.log("The read failed: " + errorObject.code);
+	});
 }
 
-var process = function(skip) {
-    var query = new Parse.Query("TPE012316");
-
-            if (skip) {
-              query.greaterThan("objectId", skip);
-            }
-            query.limit(1000);
-            query.ascending("objectId");
-            query.find().then(function querySuccess(res) {
-                processCallback(res);
-            }, function queryFailed(error) {
-                console.log('Error: ' + error.code + ' ' + error.message);
-            });
-}
-process(false);
-
+getTrashCanData();
 
 var markers = [];
 var image = 'img/pin.png';
@@ -126,17 +107,17 @@ google.maps.InfoWindow.prototype.isOpen = function(){
 var addMarker = function(data){
 
   var marker = new google.maps.Marker({
-        position : new google.maps.LatLng(data.get('location').latitude, data.get('location').longitude), 
+        position : new google.maps.LatLng(data.latitude, data.longitude), 
         map : map,
-        title : data.get('road') + data.get('address'),
+        title : data.address,
         icon : image
   });
 
   marker.infowindow = new google.maps.InfoWindow({
-      content: '<h4>'+ data.get('region') + '</h4>'
+      content: '<h4>'+ data.region + '</h4>'
           + '<p><img src="https://maps.googleapis.com/maps/api/streetview?size=400x180&location='
-          + data.get('location').latitude +','+data.get('location').longitude+'&fov=90&heading=180&pitch=10"></p>'
-          + '<h4>' + data.get('road') + data.get('address') + '</h4>'
+          + data.latitude +','+data.longitude +'&fov=90&heading=180&pitch=10"></p>'
+          + '<h4>' + data.address+ '</h4>'
           
   });
 
