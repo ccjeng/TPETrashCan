@@ -1,6 +1,11 @@
-
-//initialize
-var myFirebaseRef = new Firebase("https://tptrashcan.firebaseio.com/results");
+// Initialize Firebase
+var config = {
+    apiKey: "AIzaSyAKzyUWsDXRQzIJesKLpl9Ox1d757pbLRc",
+    authDomain: "tptrashcan.firebaseapp.com",
+    databaseURL: "https://tptrashcan.firebaseio.com",
+    storageBucket: "tptrashcan.appspot.com",
+  };
+firebase.initializeApp(config);
 
 //Get user location
 var defaultLocationLatitude = 25.0339031;
@@ -24,7 +29,7 @@ function getLocation() {
 
   function successCallback(position) {
         currentLocationLatitude = position.coords.latitude;
-        currentLocationLongitude = position.coords.longitude;    
+        currentLocationLongitude = position.coords.longitude;
 
         currentMarker();
 
@@ -82,16 +87,14 @@ var result = [];
 
 function getTrashCanData() {
 
-	myFirebaseRef.on("value", function(snapshot) {
+  firebase.database().ref('results/').on('value', function(snapshot) {
+    result = snapshot.val();
 
-	  	result = snapshot.val();
+    for(var i=0; i<result.length;i++) {
+      addMarker(result[i]);
+    }
+  });
 
-		for(var i=0; i<result.length;i++) {
-			addMarker(result[i]);
-		} 
-	}, function (errorObject) {
-	  console.log("The read failed: " + errorObject.code);
-	});
 }
 
 getTrashCanData();
@@ -107,7 +110,7 @@ google.maps.InfoWindow.prototype.isOpen = function(){
 var addMarker = function(data){
 
   var marker = new google.maps.Marker({
-        position : new google.maps.LatLng(data.latitude, data.longitude), 
+        position : new google.maps.LatLng(data.latitude, data.longitude),
         map : map,
         title : data.address,
         icon : image
@@ -118,7 +121,7 @@ var addMarker = function(data){
           + '<p><img src="https://maps.googleapis.com/maps/api/streetview?size=400x180&location='
           + data.latitude +','+data.longitude +'&fov=90&heading=180&pitch=10"></p>'
           + '<h4>' + data.address+ '</h4>'
-          
+
   });
 
   markers.push(marker);
@@ -132,5 +135,3 @@ var addMarker = function(data){
 
   });
 };
-
-
