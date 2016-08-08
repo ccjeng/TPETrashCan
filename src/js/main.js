@@ -118,8 +118,8 @@ var addMarker = function(data){
 
   marker.infowindow = new google.maps.InfoWindow({
       content: '<h4>'+ data.region + '</h4>'
-          + '<p><img src="https://maps.googleapis.com/maps/api/streetview?size=400x180&location='
-          + data.latitude +','+data.longitude +'&fov=90&heading=180&pitch=10"></p>'
+        //  + '<p><img src="https://maps.googleapis.com/maps/api/streetview?size=400x180&location='
+        //  + data.latitude +','+data.longitude +'&fov=90&heading=180&pitch=10"></p>'
           + '<h4>' + data.address+ '</h4>'
 
   });
