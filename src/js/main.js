@@ -100,7 +100,7 @@ function getTrashCanData() {
 getTrashCanData();
 
 var markers = [];
-var image = 'img/pin.png';
+var image = 'img/trash.png';
 
 google.maps.InfoWindow.prototype.isOpen = function(){
   var map = this.getMap();
