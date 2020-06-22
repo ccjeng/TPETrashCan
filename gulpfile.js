@@ -2,85 +2,84 @@
 var gulp = require('gulp');
 var concat = require('gulp-concat');
 var uglify = require('gulp-uglify');
-var jshint = require('gulp-jshint');
-var cssminify = require('gulp-minify-css');
 var imagemin = require('gulp-imagemin');
-var connect = require('gulp-connect'); 
-var livereload = require('gulp-livereload');
-var clean = require('gulp-clean');
-var sourcemaps = require('gulp-sourcemaps');
-var notify = require('gulp-notify');
+var browserSync = require('browser-sync').create();
+var del = require('del');
 
-// Error Helper
-function onError(err) {
-    console.log(err);
-}
+const dirs = {
+  src: 'src',
+  dest: 'dest'
+};
 
-// Server Task
-gulp.task('server', function() {
-    connect.server({
-        root: 'server',
-        livereload: true
-    });
-});
+const stylesPaths = {
+  src: dirs.src + '/css/*.css',
+  dest: dirs.dest + '/css'
+};
+
+const scriptsPaths = {
+  src: dirs.src + '/js/*.js',
+  dest: dirs.dest + '/js'
+};
+
+const imagesPaths = {
+  src: dirs.src + '/img/*',
+  dest: dirs.dest + '/img'
+};
 
 // Styles Task
-gulp.task('styles', function() {
-    return gulp.src('src/css/*.css')
-        .pipe(sourcemaps.init())
-        .pipe(concat('all.min.css'))
-        .pipe(cssminify())  
-        .pipe(sourcemaps.write('./'))      
-        .pipe(gulp.dest('server/css'))
-        .pipe(notify({ message: 'Styles task complete' }));
+gulp.task('styles', function () {
+     return gulp.src(stylesPaths.src)
+        .pipe(gulp.dest(stylesPaths.dest))
+        .pipe(browserSync.stream());
 });
 
 gulp.task('html', function () {
-    return gulp.src('src/*.html')
-        .pipe(gulp.dest('server'))
-        .pipe(notify({ message: 'Html task complete' }));
+    return gulp.src(dirs.src+'/*.html')
+        .pipe(gulp.dest(dirs.dest))
+        .pipe(browserSync.stream());
 });
 
 // Scripts Task
 gulp.task('scripts', function() {
-    return gulp.src('src/js/*.js')
-        .pipe(sourcemaps.init())
-        .pipe(jshint())
-        .pipe(jshint.reporter('default'))
+    return gulp.src(scriptsPaths.src)
         .pipe(concat('all.min.js'))
         .pipe(uglify())
-        .pipe(sourcemaps.write('./'))
-        .pipe(gulp.dest('server/js'))
-        .pipe(notify({ message: 'Styles task complete' }));
+        .pipe(gulp.dest(scriptsPaths.dest))
+        .pipe(browserSync.stream());
 });
 
 // Images Task
 gulp.task('images', function() {
-    return gulp.src('src/img/*')
+    return gulp.src(imagesPaths.src)
         .pipe(imagemin())
-        .pipe(gulp.dest('server/img'))
-        .pipe(notify({ message: 'Images task complete' }));
+        .pipe(gulp.dest(imagesPaths.dest))
+        .pipe(browserSync.stream());
 });
 
-
-// Clean Task
-gulp.task('clean', function() {
-    return gulp.src(['server/css/*', 'server/js/*, server/img/*'], {read: false})
-        .pipe(clean());
+gulp.task('clean', function(cb) {
+  del([scriptsPaths.dest+'/*.js', stylesPaths.dest+'/*.css'], cb)
 });
 
 // Watch Task
 gulp.task('watch', function() {
-    gulp.watch('src/*.html', ['html']);
-    gulp.watch('src/css/*.css', ['styles']);
-    gulp.watch('src/js/*.js', ['scripts']);
-    gulp.watch('src/img/*', ['images']);
+    browserSync.init({
+      server: {
+          baseDir: dirs.dest,
+      },
+      reloadDelay: 500,
+      port: 8080
+    });
+    gulp.watch('dest/*.html').on('change', browserSync.reload);
+    gulp.watch(stylesPaths.dest).on('change', browserSync.reload);
+    gulp.watch(scriptsPaths.dest).on('change', browserSync.reload);
+    gulp.watch(imagesPaths.src).on('change', browserSync.reload);
 
-    // Watch any files in server/, reload on change
-    livereload.listen();
-    gulp.watch(['server/**']).on('change', livereload.changed);
+    gulp.watch('src/*.html', gulp.series('html'));
+    gulp.watch(stylesPaths.src, gulp.series('styles'));
+    gulp.watch(scriptsPaths.src, gulp.series('scripts'));
+    gulp.watch(imagesPaths.src, gulp.series('images'));
 });
 
 // Default Task
-gulp.task('default', ['clean', 'html', 'styles', 'scripts', 'images', 'server', 'watch']);
-
+gulp.task('default', gulp.parallel(['clean', 'html', 'styles', 'scripts', 'images', 'watch']));
+gulp.task('build', gulp.parallel(['clean', 'html', 'scripts', 'styles', 'images']));
