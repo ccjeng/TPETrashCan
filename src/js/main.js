@@ -17,24 +17,26 @@ var trashIcon = L.icon({
 navigator.geolocation.getCurrentPosition(function(location) {
       var latlng = new L.LatLng(location.coords.latitude, location.coords.longitude);
 
-var map = L.map('map').setView(latlng, 16);
+      var map = L.map('map').setView(latlng, 16);
 
 
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-  }).addTo(map);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+      }).addTo(map);
 
 
-firebase.database().ref('results/').on('value', function(snapshot) {
-      result = snapshot.val();
-  
-      for(var i=0; i<result.length;i++) {
-        addMarker(result[i]);
+      firebase.database().ref('results/').on('value', function(snapshot) {
+            result = snapshot.val();
+      
+            for(var i=0; i<result.length;i++) {
+            addMarker(result[i]);
+            }
+      });  
+
+      var addMarker = function(data){
+            var marker = L.marker([data.latitude, data.longitude]
+                  , {icon: trashIcon}).addTo(map);
+            marker.bindPopup('<h4>' + data.address+ '</h4>');
       }
-});  
 
-var addMarker = function(data){
-      var marker = L.marker([data.latitude, data.longitude]
-            , {icon: trashIcon}).addTo(map);
-      marker.bindPopup('<h4>' + data.address+ '</h4>');
-}
+});
