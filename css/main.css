@@ -1,0 +1,15 @@
+#map {
+    height:100%;
+    width: 100%;
+    margin-top: 0;
+}
+
+html,body{
+    width: 100%;
+    height: 100%;
+  }
+  
+.navbar-default {
+    margin-bottom: 0;
+}
+
