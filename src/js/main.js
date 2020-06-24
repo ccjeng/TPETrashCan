@@ -34,7 +34,8 @@ navigator.geolocation.getCurrentPosition(function(location) {
       });  
 
       var addMarker = function(data){
-            var marker = L.marker([data.latitude, data.longitude]).addTo(map);
+            var marker = L.marker([data.latitude, data.longitude]
+                  , {icon: trashIcon}).addTo(map);
             marker.bindPopup('<h4>' + data.address+ '</h4>');
       }
 
